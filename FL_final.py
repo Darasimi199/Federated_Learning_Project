@@ -38,7 +38,8 @@ df['pcv'] = df['pcv'].astype(float)
 df['wc'][[76, 133, 185]] = [6200, 8400, 5800]
 df['wc'] = df['wc'].astype(float)
 
-# Filling missing values of numeric categorical columns with previous values
+# Filling missing values of numeric categorical 
+# columns with previous values
 nom_cat_col = ['sg', 'al', 'su']
 
 for col in nom_cat_col:
@@ -48,7 +49,8 @@ df.info()
 
 
 # Filling the missing values of numerical variables with their mean.
-numerical_col = ['age', 'bp', 'bgr', 'bu', 'sc', 'sod', 'pot', 'hemo', 'pcv', 'wc', 'rc']
+numerical_col = ['age', 'bp', 'bgr', 'bu', 'sc', 'sod', 
+                 'pot', 'hemo', 'pcv', 'wc', 'rc']
 
 for col in numerical_col:
   df[col] = df[col].fillna(df[col].mean())
@@ -57,7 +59,8 @@ df.info()
 
 
 # filling the missing values of categorical variables with 'unknown'.
-cat_col = ['rbc', 'pc', 'pcc', 'ba', 'htn', 'dm', 'cad', 'appet', 'pe', 'ane']
+cat_col = ['rbc', 'pc', 'pcc', 'ba', 'htn', 'dm', 
+           'cad', 'appet', 'pe', 'ane']
 
 for col in cat_col:
   df[col] = df[col].fillna('unknown')
@@ -90,7 +93,8 @@ ss = StandardScaler()
 x_standardized = ss.fit_transform(x_numeric)
 
 # Continued Preprocessing
-# Create two input layers for tensorflow model, for both numerical and categorical feature   
+# Create two input layers for tensorflow model, 
+# for both numerical and categorical feature   
 numeric_inputs = tf.keras.layers.Input((11,), name='numeric_inputs')
 cat_inputs = tf.keras.layers.Input((13,), name='cat_inputs')
 
@@ -109,7 +113,8 @@ num_categories = 51
   cats = embedding_layer(cat_inputs)
   cats = tf.keras.layers.Flatten()(cats)
 
-# Concatenate the preprocessed numerical and categorical data to make your final feature dataset
+# Concatenate the preprocessed numerical and 
+# categorical data to make your final feature dataset
 df = tf.keras.layers.Concatenate()([cats, numeric_inputs])
 
 
@@ -123,6 +128,7 @@ client_ids = df[client_id_colname].unique()
 train_client_ids = pd.DataFrame(client_ids).sample(frac=0.5).values.tolist()
 test_client_ids = [y for y in client_ids if y not in train_client_ids]
 
+
 def create_tf_dataset_for_client_fn(client_id):
   # a function which takes a client_id and returns a
   # tf.data.Dataset for that client
@@ -133,15 +139,14 @@ def create_tf_dataset_for_client_fn(client_id):
 
 train_data = tff.simulation.datasets.ClientData.from_clients_and_fn(
         client_ids=train_client_ids,
-        create_tf_dataset_for_client_fn=create_tf_dataset_for_client_fn
-    )
+        create_tf_dataset_for_client_fn=create_tf_dataset_for_client_fn)
+
 test_data = tff.simulation.datasets.ClientData.from_clients_and_fn(
         client_ids=test_client_ids,
-        create_tf_dataset_for_client_fn=create_tf_dataset_for_client_fn
-    )
+        create_tf_dataset_for_client_fn=create_tf_dataset_for_client_fn)
+
 example_dataset = train_data.create_tf_dataset_for_client(
-        train_data.client_ids[0]
-    )
+        train_data.client_ids[0])
 
 
 ### MODEL BUILDING
@@ -152,8 +157,7 @@ def create_keras_model():
   return tf.keras.models.Sequential([
       tf.keras.layers.Input(shape=(df.shape[0])),
       tf.keras.layers.Dense(10, activation='relu'),
-      tf.keras.layers.Dense(1, activation='sigmoid')
-  ])
+      tf.keras.layers.Dense(1, activation='sigmoid')])
 
 def model_fn():
   keras_model = create_keras_model()
